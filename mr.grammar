@@ -34,7 +34,7 @@
          | <hour_unit> <cn_half> {nf.minute($1)}
          ;
 
-<time> = <hour> {nf.time($1)}
+[time] = <hour> {nf.time($1)}
         | <hour> <minute> {nf.time($1, $2)}
         ;
 

@@ -6,7 +6,7 @@ import (
 
 func TestMatchFrames(t *testing.T) {
 	cases := []string{
-		`订黑暗森林`,
+		`两点半订黑暗森林`,
 	}
 	g, err := GrammarFromFile("mr.grammar")
 	if err != nil {
