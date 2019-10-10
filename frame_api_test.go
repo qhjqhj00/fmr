@@ -6,10 +6,9 @@ import (
 
 func TestMatchFrames(t *testing.T) {
 	cases := []string{
-		`预定黑暗森林`,
+		`订黑暗森林`,
 	}
 	g, err := GrammarFromFile("mr.grammar")
-	t.Log(g)
 	if err != nil {
 		t.Error(err)
 	}
