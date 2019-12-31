@@ -56,18 +56,22 @@ func (p *parser) funcArgs() (args []*Arg, err error) {
 	for {
 		p.ws()
 		switch r = p.peek(); {
+		// if argument starts with a $, it is an index argument
 		case r == '$':
 			if arg, err = p.idxArg(); err != nil {
 				return
 			}
+		// if argument starts with a ", it is a string argument
 		case r == '"':
 			if arg, err = p.strArg(); err != nil {
 				return
 			}
+		// if argument start with a digit, it is a num argument. "false" refers to not negtive
 		case unicode.IsDigit(r):
 			if arg, err = p.numArg(false); err != nil {
 				return
 			}
+		// if argument starts with a "-", it is a num argument and negtive
 		case r == '-':
 			if err = p.eat('-'); err != nil {
 				return
@@ -80,6 +84,9 @@ func (p *parser) funcArgs() (args []*Arg, err error) {
 				return
 			}
 		}
+		// when encountering ',', continue
+		// when encountering ')', break
+		// else raise error
 		args = append(args, arg)
 		if r == ',' {
 			continue
@@ -99,15 +106,19 @@ func (p *parser) funcArgs() (args []*Arg, err error) {
 	return
 }
 
+// idxArg is a parser for index argument
+
 func (p *parser) idxArg() (arg *Arg, err error) {
 	if err = p.eat('$'); err != nil {
 		return
 	}
+	// '@' refers to context argument
 	if p.peek() == '@' {
 		p.eat('@')
 		arg = &Arg{"context", "@"}
 		return
 	}
+	// if an int n follows, get the nth argument
 	var idx int
 	if idx, err = p.getInt(); err != nil {
 		return
@@ -115,6 +126,8 @@ func (p *parser) idxArg() (arg *Arg, err error) {
 	arg = &Arg{"index", idx}
 	return
 }
+
+// strArg is a parser for string argument
 
 func (p *parser) strArg() (*Arg, error) {
 	var text string
@@ -125,6 +138,7 @@ func (p *parser) strArg() (*Arg, error) {
 	return &Arg{"string", text}, nil
 }
 
+// numArg is a parser for number
 func (p *parser) numArg(neg bool) (*Arg, error) {
 	var ret []rune
 	hasDot := false
@@ -135,6 +149,7 @@ func (p *parser) numArg(neg bool) (*Arg, error) {
 			if hasDot {
 				return nil, fmt.Errorf("%s : unexpected dot", p.posInfo())
 			}
+			// if enconter '.', it is a float
 			hasDot = true
 			ret = append(ret, r)
 		} else {
@@ -161,6 +176,8 @@ func (p *parser) numArg(neg bool) (*Arg, error) {
 	}
 	return &Arg{"int", n}, nil
 }
+
+// fArg is a parser for function
 
 func (p *parser) fArg() (*Arg, error) {
 	var f *FMR
