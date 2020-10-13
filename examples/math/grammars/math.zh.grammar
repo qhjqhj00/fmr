@@ -5,7 +5,9 @@
 #include "number.zh.grammar"
 
 // for local grammars that come from regex tagger
-<number> = <numeric> {nf.math.to_number($1)};
+<number> = <numeric> {nf.math.to_number($1)}
+         | <number> {nf.math.to_number($1)}
+         ;
 
 <number> = <number> "打" {nf.math.mul($1, 12)};
 
